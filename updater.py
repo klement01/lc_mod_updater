@@ -2,21 +2,29 @@
 Collects Lethal Company mods from Thunderstore (thunderstore.io).
 """
 
+# pylint: disable=logging-fstring-interpolation
+
 import argparse
 import bs4
 import dataclasses
 import datetime
 import logging
+import os
 import pathlib
 import re
 import requests
+import shutil
 import sys
 import urllib.parse
+import zipfile
 
 DOMAIN = "thunderstore.io"
 DOMAIN_SCHEMA = f"https://{DOMAIN}"
 
-# pylint: disable=logging-fstring-interpolation
+LVL1_FOLDER = pathlib.Path("BepInEx")
+LVL2_FOLDERS = [
+    pathlib.Path(p) for p in ["cache", "config", "core", "patchers", "plugins"]
+]
 
 
 @dataclasses.dataclass
@@ -37,6 +45,9 @@ class ModListing:
 
 def __main():
     """Collects settings from command line arguments."""
+    time_now = datetime.datetime.now()
+    time_stamp = time_now.strftime("%Y-%m-%d_%H-%M-%S")
+
     parser = argparse.ArgumentParser(
         prog="Lethal Company Mod Updater",
         description="Downloads latest versions of provided mods from thunderstore.io",
@@ -57,12 +68,22 @@ def __main():
         "-e",
         "--export",
         nargs="?",
-        default=sys.stdout,
         type=pathlib.Path,
+        const=pathlib.Path(f"LC_modlist_{time_stamp}.txt"),
         help="Export formatted mod list from acquired data",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Enable verbose logging",
     )
 
     args = parser.parse_args()
+
+    # Enable verbose logging.
+    if args.verbose:
+        logging.getLogger().setLevel(logging.INFO)
 
     # TODO: implement version checking.
     assert not args.check_version, "Version checking not implemented"
@@ -70,10 +91,14 @@ def __main():
     # Extract all URLs from file.
     urls = get_urls_from_file(args.mod_list_file)
 
+    # Assert any URL has been found.
+    if len(urls) == 0:
+        exit_failure("No URLs found in file")
+
     # Check if all URLs are from the correct domain.
     for url in urls:
         if urllib.parse.urlparse(url).netloc != DOMAIN:
-            raise ValueError(f"URL not from {DOMAIN}: {url}")
+            exit_failure(f"URL not from {DOMAIN}: {url}")
 
     # Collect mod data.
     original_mods, dependencies = collect_mod_data(urls)
@@ -85,8 +110,71 @@ def __main():
     # Download all mods.
     all_mods = original_mods[::]
     all_mods.extend(dependencies)
+
+    mod_paths = []
     for mod in all_mods:
-        download_mod_from_listing(mod)
+        mod_path = download_mod_from_listing(mod)
+        mod_paths.append(mod_path)
+
+    # Create base file tree.
+    base_path = pathlib.Path(f"LC_modpack_{time_stamp}")
+    create_modpack_tree(base_path)
+
+    # Extract mods.
+    for mod_path in mod_paths:
+        extract_mod(base_path, mod_path)
+
+
+def create_modpack_tree(base_path: pathlib.Path):
+    """Create the basic tree for the mods."""
+    logging.info(f"Creating tree at: {base_path}")
+    try:
+        os.mkdir(base_path)
+    except FileExistsError:
+        exit_failure(f"Folder {base_path} already exists")
+
+    os.mkdir(base_path / LVL1_FOLDER)
+    for lvl2_folder in LVL2_FOLDERS:
+        os.mkdir(base_path / LVL1_FOLDER / lvl2_folder)
+
+
+def extract_mod(base_path: pathlib.Path, mod_path: pathlib.Path):
+    """Tries extracting the mod to the correct place in the base tree."""
+    logging.info(f"Verifying: {mod_path}")
+    file = zipfile.ZipFile(mod_path)
+    contents = [
+        c
+        for c in file.namelist()
+        if c not in ["icon.png", "manifest.json", "README.md", "CHANGELOG.md"]
+    ]
+    paths = [pathlib.Path(c) for c in contents]
+
+    # Determines where to extract files.
+    is_bepinex = False
+    if any(path.parts[0] == "BepInExPack" for path in paths):
+        # Mod is BepInEx.
+        is_bepinex = True
+        extract_path = base_path
+    elif any(path.parts[0] == "BepInEx" for path in paths):
+        # Mod should be placed in root.
+        extract_path = base_path
+    elif any(pathlib.Path(path.parts[0]) in LVL2_FOLDERS for path in paths):
+        # Mod should be placed in BepInEx folder.
+        extract_path = base_path / pathlib.Path("BepInEx")
+    else:
+        # Mod should be placed in BepInEx/plugins
+        extract_path = base_path / pathlib.Path("BepInEx/plugins")
+
+    logging.info(f"Unpacking: {mod_path}")
+    for content in contents:
+        file.extract(content, extract_path)
+    if is_bepinex:
+        logging.info(f"BepInEx detected: {mod_path}")
+        pack_path = extract_path / pathlib.Path("BepInExPack")
+        shutil.copytree(pack_path, extract_path, dirs_exist_ok=True)
+        shutil.rmtree(pack_path)
+
+    file.close()
 
 
 def get_urls_from_file(file: pathlib.Path) -> [str]:
@@ -113,11 +201,11 @@ def export_mod_list(file: pathlib.Path, listings: [ModListing]):
             f.write(line)
 
 
-def download_mod_from_listing(mod: ModListing):
-    """Download mod from ModListing using given URL and data."""
+def download_mod_from_listing(mod: ModListing) -> pathlib.Path:
+    """Download mod from ModListing using given URL and data, return path."""
     logging.info(f"Downloading mod: {mod.name}")
 
-    path = f"{mod.full_id()}.zip"
+    path = pathlib.Path(f"{mod.full_id()}.zip")
     file = get_data_from_url(mod.download)
 
     logging.info(f"Saving mod {mod.name} as {path}")
@@ -125,6 +213,8 @@ def download_mod_from_listing(mod: ModListing):
     with open(path, mode="wb") as f:
         for chunk in file.iter_content(chunk_size=1024):
             f.write(chunk)
+
+    return path
 
 
 def collect_mod_data(urls: [str]) -> ([ModListing], [ModListing]):
@@ -145,6 +235,7 @@ def collect_mod_data(urls: [str]) -> ([ModListing], [ModListing]):
 
         # All dependencies have been gotten.
         if len(new_urls) == 0:
+            logging.info("No more dependencies found")
             break
 
         logging.info(f"New dependencies found: <{'>, <'.join(new_urls)}>")
@@ -164,8 +255,7 @@ def get_mod_listing(url: str) -> ModListing:
     html = get_data_from_url(url).text
 
     if html is None:
-        logging.critical("Failed to obtain mod info")
-        exit_failure()
+        exit_failure("Failed to obtain mod info")
 
     html = bs4.BeautifulSoup(html, features="html.parser")
 
@@ -198,30 +288,28 @@ def get_mod_listing(url: str) -> ModListing:
     )
 
 
-def get_data_from_url(url: str) -> str | None:
+def get_data_from_url(url: str) -> requests.models.Response:
     """Return data from a URL or None if it fails."""
     try:
         r = requests.get(url, timeout=5)
     # pylint: disable=broad-exception-caught]
     except Exception as e:
-        logging.critical(f"Error obtaining URL <{url}>: {e}")
-        return
+        exit_failure(f"Error obtaining URL <{url}>: {e}")
 
     if r.status_code != 200:
-        logging.critical(f"URL <{url}> returned code {r.status_code}")
-        return
+        exit_failure(f"URL <{url}> returned code {r.status_code}")
 
     return r
 
 
-def exit_failure():
-    """Exits the program with an error."""
+def exit_failure(mes, logging_function=logging.critical):
+    """Exits the program with an error, logging the message."""
+    logging_function(mes)
     sys.exit("Forcing program exit")
 
 
 if __name__ == "__main__":
     try:
-        logging.getLogger().setLevel(logging.INFO)
         __main()
     except SystemExit as __e:
         raise __e
