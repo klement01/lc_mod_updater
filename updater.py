@@ -43,8 +43,17 @@ class ModListing:
         return f"{self.name}_{self.last_updated.isoformat()}_{self.version}"
 
 
+@dataclasses.dataclass
+class Patch:
+    """Data about a game patch."""
+
+    date: datetime.date
+    title: str | None
+
+
 def __main():
     """Collects settings from command line arguments."""
+    today = datetime.date.today()
     time_now = datetime.datetime.now()
     time_stamp = time_now.strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -57,12 +66,6 @@ def __main():
         "mod_list_file",
         type=pathlib.Path,
         help="File with mod URLs between brackets: <thunderstore.io/package/...>",
-    )
-    parser.add_argument(
-        "-c",
-        "--check-version",
-        action="store_true",
-        help="Check if mods have been updated for the latest version",
     )
     parser.add_argument(
         "-e",
@@ -85,9 +88,6 @@ def __main():
     if args.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
-    # TODO: implement version checking.
-    assert not args.check_version, "Version checking not implemented"
-
     # Extract all URLs from file.
     urls = get_urls_from_file(args.mod_list_file)
 
@@ -106,6 +106,15 @@ def __main():
     # Export formatted mod list, if requested.
     if args.export:
         export_mod_list(args.export, original_mods)
+
+    # Shows last update time (from oldest to newest)
+    for mod in sorted(original_mods, key=lambda m: m.last_updated):
+        last_updated = mod.last_updated
+        delta = (today - last_updated).days
+        print(
+            f"{mod.name}: updated {delta} day(s) ago ({last_updated.isoformat()}, "
+            f"version {mod.version}, <{mod.url}>)"
+        )
 
     # Download all mods.
     all_mods = original_mods[::]
@@ -242,8 +251,8 @@ def collect_mod_data(urls: [str]) -> ([ModListing], [ModListing]):
 
         urls.update(new_urls)
 
-    original_mods = listings[: len(urls)]
-    dependencies = listings[len(urls) :]
+    original_mods = listings[: len(urls) - 1]
+    dependencies = listings[len(urls) - 1 :]
 
     return original_mods, dependencies
 
@@ -252,12 +261,7 @@ def get_mod_listing(url: str) -> ModListing:
     """Creates a ModListing object from mod url."""
     logging.info(f"Getting info from: <{url}>")
 
-    html = get_data_from_url(url).text
-
-    if html is None:
-        exit_failure("Failed to obtain mod info")
-
-    html = bs4.BeautifulSoup(html, features="html.parser")
+    html = bs4.BeautifulSoup(get_data_from_url(url).text, features="html.parser")
 
     # Name.
     name = html.find("h1", class_="mt-0").text
