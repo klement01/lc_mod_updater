@@ -21,10 +21,10 @@ import zipfile
 DOMAIN = "thunderstore.io"
 DOMAIN_SCHEMA = f"https://{DOMAIN}"
 
-LVL1_FOLDER = pathlib.Path("BepInEx")
-LVL2_FOLDERS = [
-    pathlib.Path(p) for p in ["cache", "config", "core", "patchers", "plugins"]
-]
+LV1_FOLDER_NAME = "BepInEx"
+LVL1_FOLDER = pathlib.Path(LV1_FOLDER_NAME)
+LVL2_FOLDER_NAMES = ["cache", "config", "core", "patchers", "plugins"]
+LVL2_FOLDERS = [pathlib.Path(p) for p in LVL2_FOLDER_NAMES]
 
 
 @dataclasses.dataclass
@@ -129,8 +129,8 @@ def __main():
     base_path = pathlib.Path(f"LC_modpack_{time_stamp}")
     create_modpack_tree(base_path)
 
-    # Extract mods.
-    for mod_path in mod_paths:
+    # Extract mods (dependencies first).
+    for mod_path in reversed(mod_paths):
         extract_mod(base_path, mod_path)
 
 
@@ -164,10 +164,13 @@ def extract_mod(base_path: pathlib.Path, mod_path: pathlib.Path):
         # Mod is BepInEx.
         is_bepinex = True
         extract_path = base_path
-    elif any(path.parts[0] == "BepInEx" for path in paths):
+    elif any(path.parts[0].lower() == LV1_FOLDER_NAME.lower() for path in paths):
         # Mod should be placed in root.
         extract_path = base_path
-    elif any(pathlib.Path(path.parts[0]) in LVL2_FOLDERS for path in paths):
+    elif any(
+        path.parts[0].lower() in [f.lower() for f in LVL2_FOLDER_NAMES]
+        for path in paths
+    ):
         # Mod should be placed in BepInEx folder.
         extract_path = base_path / pathlib.Path("BepInEx")
     else:
@@ -203,7 +206,7 @@ def export_mod_list(file: pathlib.Path, listings: [ModListing]):
     logging.info(f"Exporting mod list for {len(listings)} mod(s)")
 
     with open(file, encoding="utf-8", mode="w") as f:
-        for listing in listings:
+        for listing in sorted(listings, key=lambda m: m.name):
             name = listing.name
             url = listing.url
             line = f"{name}\n<{url}>\n\n"
@@ -212,13 +215,15 @@ def export_mod_list(file: pathlib.Path, listings: [ModListing]):
 
 def download_mod_from_listing(mod: ModListing) -> pathlib.Path:
     """Download mod from ModListing using given URL and data, return path."""
-    logging.info(f"Downloading mod: {mod.name}")
-
     path = pathlib.Path(f"{mod.full_id()}.zip")
+    if path.is_file():
+        logging.info(f"Skipping download, archive found at: {path}")
+        return path
+
+    logging.info(f"Downloading mod: {mod.name}")
     file = get_data_from_url(mod.download)
 
     logging.info(f"Saving mod {mod.name} as {path}")
-
     with open(path, mode="wb") as f:
         for chunk in file.iter_content(chunk_size=1024):
             f.write(chunk)
