@@ -1,5 +1,5 @@
-AbsasCosmetics
-<https://thunderstore.io/c/lethal-company/p/NiaNation/AbsasCosmetics/>
+3rdPerson
+<https://thunderstore.io/c/lethal-company/p/Verity/3rdPerson/>
 
 AdditionalSuits
 <https://thunderstore.io/c/lethal-company/p/AlexCodesGames/AdditionalSuits/>
@@ -10,32 +10,17 @@ AlwaysHearActiveWalkies
 Aquatis
 <https://thunderstore.io/c/lethal-company/p/sfDesat/Aquatis/>
 
-Backrooms
-<https://thunderstore.io/c/lethal-company/p/Backrooms/Backrooms/>
-
-BandaidsMegaCosmetics
-<https://thunderstore.io/c/lethal-company/p/bandaidroo/BandaidsMegaCosmetics/>
-
-CoilHeadStare
-<https://thunderstore.io/c/lethal-company/p/TwinDimensionalProductions/CoilHeadStare/>
-
 DoorFix
 <https://thunderstore.io/c/lethal-company/p/itsmeowdev/DoorFix/>
 
 E Gypt Moon
 <https://thunderstore.io/c/lethal-company/p/KayNetsua/E_Gypt_Moon/>
 
-EmployeeAssignments
-<https://thunderstore.io/c/lethal-company/p/amnsoft/EmployeeAssignments/>
-
-FairAI
-<https://thunderstore.io/c/lethal-company/p/TheFluff/FairAI/>
-
 FlashlightToggle
 <https://thunderstore.io/c/lethal-company/p/Renegades/FlashlightToggle/>
 
-HideChat
-<https://thunderstore.io/c/lethal-company/p/Monkeytype/HideChat/>
+Helmet Cameras
+<https://thunderstore.io/c/lethal-company/p/RickArg/Helmet_Cameras/>
 
 KarmaForBeingAnnoying
 <https://thunderstore.io/c/lethal-company/p/CTMods/KarmaForBeingAnnoying/>
@@ -45,9 +30,6 @@ Kast
 
 LC Masked Fix
 <https://thunderstore.io/c/lethal-company/p/kuba6000/LC_Masked_Fix/>
-
-LRCCosmetics
-<https://thunderstore.io/c/lethal-company/p/LRC/LRCCosmetics/>
 
 LateCompany
 <https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/>
@@ -64,17 +46,11 @@ MaskedEnemyOverhaul
 Mimics
 <https://thunderstore.io/c/lethal-company/p/x753/Mimics/>
 
-MirrorDecor
-<https://thunderstore.io/c/lethal-company/p/quackandcheese/MirrorDecor/>
-
 More Emotes
 <https://thunderstore.io/c/lethal-company/p/Sligili/More_Emotes/>
 
 MoreCompany
 <https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/>
-
-MoreItems
-<https://thunderstore.io/c/lethal-company/p/Drakorle/MoreItems/>
 
 Orion
 <https://thunderstore.io/c/lethal-company/p/sfDesat/Orion/>
@@ -93,10 +69,4 @@ Skinwalkers
 
 SpectateEnemies
 <https://thunderstore.io/c/lethal-company/p/AllToasters/SpectateEnemies/>
-
-SuitSaver
-<https://thunderstore.io/c/lethal-company/p/Hexnet111/SuitSaver/>
-
-Terminal Clock
-<https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/>
 
