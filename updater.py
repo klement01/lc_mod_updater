@@ -235,6 +235,7 @@ def collect_mod_data(urls: [str]) -> ([ModListing], [ModListing]):
     """Gets data for all mods pointed by the URL list and their dependencies."""
     logging.info(f"Collecting mod data from {len(urls)} URL(s)")
 
+    n_mods = len(urls)
     listings = []
 
     urls = set(urls)
@@ -256,8 +257,8 @@ def collect_mod_data(urls: [str]) -> ([ModListing], [ModListing]):
 
         urls.update(new_urls)
 
-    original_mods = listings[: len(urls) - 1]
-    dependencies = listings[len(urls) - 1 :]
+    original_mods = listings[:n_mods]
+    dependencies = listings[n_mods:]
 
     return original_mods, dependencies
 
@@ -322,6 +323,8 @@ if __name__ == "__main__":
         __main()
     except SystemExit as __e:
         raise __e
+    except KeyboardInterrupt:
+        logging.info("Stopping due to user interrupt")
     except Exception as __e:
         logging.critical(f"Unexpected exception: {__e}")
         raise __e

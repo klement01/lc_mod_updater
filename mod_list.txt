@@ -1,3 +1,6 @@
+AbsasCosmetics
+<https://thunderstore.io/c/lethal-company/p/NiaNation/AbsasCosmetics/>
+
 AdditionalSuits
 <https://thunderstore.io/c/lethal-company/p/AlexCodesGames/AdditionalSuits/>
 
@@ -10,8 +13,11 @@ Aquatis
 Backrooms
 <https://thunderstore.io/c/lethal-company/p/Backrooms/Backrooms/>
 
-BepInExPack
-<https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/>
+BandaidsMegaCosmetics
+<https://thunderstore.io/c/lethal-company/p/bandaidroo/BandaidsMegaCosmetics/>
+
+CoilHeadStare
+<https://thunderstore.io/c/lethal-company/p/TwinDimensionalProductions/CoilHeadStare/>
 
 DoorFix
 <https://thunderstore.io/c/lethal-company/p/itsmeowdev/DoorFix/>
@@ -34,20 +40,26 @@ HideChat
 KarmaForBeingAnnoying
 <https://thunderstore.io/c/lethal-company/p/CTMods/KarmaForBeingAnnoying/>
 
+Kast
+<https://thunderstore.io/c/lethal-company/p/Ceelery/Kast/>
+
+LC Masked Fix
+<https://thunderstore.io/c/lethal-company/p/kuba6000/LC_Masked_Fix/>
+
+LRCCosmetics
+<https://thunderstore.io/c/lethal-company/p/LRC/LRCCosmetics/>
+
 LateCompany
 <https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/>
 
 LetMeLookDown
 <https://thunderstore.io/c/lethal-company/p/FlipMods/LetMeLookDown/>
 
-LethalCompany InputUtils
-<https://thunderstore.io/c/lethal-company/p/Rune580/LethalCompany_InputUtils/>
+LethalPresents
+<https://thunderstore.io/c/lethal-company/p/Azim/LethalPresents/>
 
-LethalExpansion
-<https://thunderstore.io/c/lethal-company/p/HolographicWings/LethalExpansion/>
-
-LethalLib
-<https://thunderstore.io/c/lethal-company/p/Evaisa/LethalLib/>
+MaskedEnemyOverhaul
+<https://thunderstore.io/c/lethal-company/p/HomelessGinger/MaskedEnemyOverhaul/>
 
 Mimics
 <https://thunderstore.io/c/lethal-company/p/x753/Mimics/>
@@ -67,6 +79,9 @@ MoreItems
 Orion
 <https://thunderstore.io/c/lethal-company/p/sfDesat/Orion/>
 
+OuijaBoard
+<https://thunderstore.io/c/lethal-company/p/Electric131/OuijaBoard/>
+
 Peaches Castle
 <https://thunderstore.io/c/lethal-company/p/TeamBridget/Peaches_Castle/>
 
@@ -79,9 +94,9 @@ Skinwalkers
 SpectateEnemies
 <https://thunderstore.io/c/lethal-company/p/AllToasters/SpectateEnemies/>
 
+SuitSaver
+<https://thunderstore.io/c/lethal-company/p/Hexnet111/SuitSaver/>
+
 Terminal Clock
 <https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/>
-
-TerminalApi
-<https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/TerminalApi/>
 
