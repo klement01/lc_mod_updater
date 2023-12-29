@@ -43,14 +43,6 @@ class ModListing:
         return f"{self.name}_{self.last_updated.isoformat()}_{self.version}"
 
 
-@dataclasses.dataclass
-class Patch:
-    """Data about a game patch."""
-
-    date: datetime.date
-    title: str | None
-
-
 def __main():
     """Collects settings from command line arguments."""
     today = datetime.date.today()
